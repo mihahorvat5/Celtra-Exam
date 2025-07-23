@@ -1,0 +1,50 @@
+// light mode definitions
+$light-bg:      #F4F5F6;
+$light-surface: #FFFFFF;
+$light-text:    #454555;
+$light-muted:   #AAACB7;
+$light-button:  #E7E8EB;
+
+// dark mode definitions
+$dark-bg:       #000D4C;
+$dark-surface:  #101F5C;
+$dark-text:     #E9ECEF;
+$dark-muted:    #8A92B2;
+$dark-button:   #20306C;
+
+$accent-blue:   #367BFF;
+
+
+:root {
+  // default
+  --color-background:         #{$light-bg};
+  --color-surface:            #{$light-surface};
+  --color-border:             #{$light-button};
+
+  --color-text-primary:       #{$light-text};
+  --color-text-secondary:     #{$light-muted};
+
+  --color-button-bg:          #{$light-button};
+  --color-button-text:        #{$light-text};
+
+  --color-accent:             #{$accent-blue};
+  --color-accent-text:        #{$light-surface};
+}
+
+html[data-theme='dark'] {
+  // dark mode
+  --color-background:         #{$dark-bg};
+  --color-surface:            #{$dark-surface};
+  --color-border:             #{$dark-button};
+
+  --color-text-primary:       #{$dark-text};
+  --color-text-secondary:     #{$dark-muted};
+
+  --color-button-bg:          #{$dark-button};
+  --color-button-text:        #{$dark-text};
+
+  --color-accent:             #{$accent-blue};
+  --color-accent-text:        #{$light-surface};
+
+  color-scheme: dark;
+}
