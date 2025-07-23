@@ -31,13 +31,9 @@ watch(isDarkMode, (newVal) => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  height: 100%;
   text-align: center;
-  padding: 2rem;
-
-  background-color: var(--color-background);
   color: var(--color-text-secondary);
-  transition: background-color 0.2s ease, color 0.2s ease;
 
   h1 {
     color: var(--color-text-primary);
@@ -52,7 +48,6 @@ watch(isDarkMode, (newVal) => {
     border-radius: 8px;
     cursor: pointer;
     font-weight: 500;
-    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
     
     background-color: var(--color-surface);
     color: var(--color-text-primary);

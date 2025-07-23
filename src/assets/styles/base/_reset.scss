@@ -13,8 +13,10 @@ html:focus-within {
   scroll-behavior: smooth;
 }
 
-body {
-  min-height: 100%;
+body, html {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   text-rendering: optimizeSpeed;
   line-height: normal;
 }
