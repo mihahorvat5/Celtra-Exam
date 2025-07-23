@@ -1,31 +1,6 @@
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-body,
-h1,
-p {
-  margin: 0;
-}
-body {
-  min-height: 100vh;
-  line-height: 1.5;
-}
-img,
-picture {
-  max-width: 100%;
-  display: block;
-}
-input,
-button,
-textarea,
-select {
-  font: inherit;
-}
+@use 'abstracts/variables';
+@use 'base/reset';
+@use 'base/typography';
+@use 'core/globals';
 
-body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background-color: #f8f9fa;
-  color: #333;
-}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
