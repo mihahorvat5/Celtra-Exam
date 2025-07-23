@@ -6,6 +6,7 @@ body {
   flex-direction: column;
   overflow: auto;
   padding: 0.3rem;
+  padding-bottom: 0px;
 }
 #app {
   height: 100%;
@@ -23,4 +24,8 @@ a {
   &:hover {
     text-decoration: underline;
   }
+}
+
+html.view-mode--diff body {
+  padding-bottom: 0.3rem;
 }
