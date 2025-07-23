@@ -1,7 +1,18 @@
 body {
   background-color: var(--color-background);
   color: var(--color-text-primary);
-  transition: background-color 0.2s ease, color 0.2s ease;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  padding: 0.3rem;
+}
+#app {
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
 }
 
 a {
