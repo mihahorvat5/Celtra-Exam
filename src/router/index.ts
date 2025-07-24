@@ -11,8 +11,8 @@ const router = createRouter({
       children: [
         {
           path: '',
-          name: 'home',
-          component: () => import('@/views/HomeView.vue')
+          name: 'gallery',
+          component: () => import('@/features/gallery/GalleryView.vue')
         },
         {
           path: 'card-info/:id',

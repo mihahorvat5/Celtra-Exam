@@ -11,11 +11,6 @@ const { viewMode } = storeToRefs(uiStore);
 <template>
   <div class="main-layout">
     <MainHeader />
-    <!--
-      We add a dynamic class binding here.
-      If viewMode is 'DIFF', it will add the class "content--diff-mode".
-      Otherwise, it adds nothing.
-    -->
     <main
       class="content"
       :class="{ 'content--diff-mode': viewMode === 'DIFF' }"
@@ -31,6 +26,7 @@ const { viewMode } = storeToRefs(uiStore);
   flex-direction: column;
   min-height: 100%;
   background-color: var(--color-background);
+  overflow: auto;
 }
 
 .content {
@@ -38,10 +34,11 @@ const { viewMode } = storeToRefs(uiStore);
   width: 100%;
   margin: 0 auto;
   background-color: var(--color-surface);
-  border-radius: 8px 8px 0 0;
-}
-
-.content--diff-mode {
   border-radius: 8px;
+
+  overflow: auto;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 </style>

@@ -15,7 +15,7 @@ import { RouterView } from 'vue-router';
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100%;
+  height: 100%;
   background-color: var(--color-background);
 }
 

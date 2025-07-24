@@ -6,20 +6,14 @@ import { storeToRefs } from 'pinia';
 import { useUiStore } from '@/stores/uiStore';
 import IconToggle from '@/components/ui/IconToggle.vue';
 
-import LogoLight from '@/assets/logos/logo.svg?component';
-import LogoDark from '@/assets/logos/logo-dark.svg?component';
+import Logo from '@/assets/logos/logo.svg?component';
 
-import OneToOneIcon from '@/assets/icons/1_1.svg?component';
-import DiffIcon from '@/assets/icons/diff.svg?component';
 import MoonIcon from '@/assets/icons/moon.svg?component';
 import SunIcon from '@/assets/icons/sun.svg?component';
 
 const uiStore = useUiStore();
-const { isDarkMode, isDiffMode } = storeToRefs(uiStore);
+const { isDarkMode } = storeToRefs(uiStore);
 
-const currentLogoComponent = computed(() => {
-  return isDarkMode.value ? LogoDark : LogoLight;
-});
 </script>
 
 <template>
@@ -27,18 +21,12 @@ const currentLogoComponent = computed(() => {
     <div class="header-content">
       <div class="header-left">
         <RouterLink to="/" class="logo-link" aria-label="Homepage">
-          <component :is="currentLogoComponent" class="logo-svg" />
+          <Logo class="logo-svg" />
         </RouterLink>
       </div>
 
       <div class="header-right">
         <div class="actions-container">
-          <div class="action-item">
-            <IconToggle v-model="isDiffMode" aria-label="Toggle View Mode">
-              <template #on><DiffIcon /></template>
-              <template #off><OneToOneIcon /></template>
-            </IconToggle>
-          </div>
           <div class="action-item">
             <IconToggle v-model="isDarkMode" aria-label="Toggle Dark Mode">
               <template #on><MoonIcon /></template>
@@ -72,5 +60,7 @@ const currentLogoComponent = computed(() => {
   flex-direction: row;
   gap: 0.6rem;
 }
-
+.logo-svg {
+  color: var(--color-logo);
+}
 </style>
