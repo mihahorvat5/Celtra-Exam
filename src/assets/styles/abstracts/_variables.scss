@@ -14,9 +14,19 @@ $dark-button:   #3e4e88;
 
 $accent-blue:   #367BFF;
 
+// combined
+$color-skeleton-start: #efe9e9;
+$color-skeleton-end: #ced4da;
+$color-skeleton-start: #e9ecef;
 
 :root {
   // default
+  --color-logo: #000000;
+
+  --color-skeleton-start:     #{$color-skeleton-start};
+  --color-skeleton-end:       #{$color-skeleton-end};
+  --color-skeleton-start:     #{$color-skeleton-start};
+
   --color-background:         #{$light-bg};
   --color-surface:            #{$light-surface};
   --color-border:             #{$light-button};
@@ -33,6 +43,12 @@ $accent-blue:   #367BFF;
 
 html[data-theme='dark'] {
   // dark mode
+  --color-logo: #FFFFFF;
+
+  --color-skeleton-start:     #{$color-skeleton-start};
+  --color-skeleton-end:       #{$color-skeleton-end};
+  --color-skeleton-start:     #{$color-skeleton-start};
+
   --color-background:         #{$dark-bg};
   --color-surface:            #{$dark-surface};
   --color-border:             #{$dark-button};
