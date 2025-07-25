@@ -1,22 +1,29 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, watch, nextTick } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useGalleryStore } from '@/stores/galleryStore';
 import { useUiStore } from '@/stores/uiStore';
+import { useImageStore } from '@/stores/imageStore';
+import { useGalleryViewStore } from '@/stores/galleryViewStore';
+import { useUserHistoryStore } from '@/stores/userHistoryStore';
 import ImageCard from './components/ImageCard.vue';
 import GalleryControls from './components/GalleryControls.vue';
 
 const ITEMS_PER_PAGE = 20;
 const TRIGGER_CARD_INDEX = 13;
-
-//50% visible da šteje v counter - manj bo štelo prej, več bo štelo kasneje
 const VISIBILITY_THRESHOLD = 0.5;
 
-const galleryStore = useGalleryStore();
-const { currentImages, currentPage, isLoading, error, isLastPage, totalPages, isFetchingMore } = storeToRefs(galleryStore);
-
 const uiStore = useUiStore();
+const imageStore = useImageStore();
+const galleryViewStore = useGalleryViewStore();
+const userHistoryStore = useUserHistoryStore();
+
 const { isTouchDevice } = storeToRefs(uiStore);
+const { isLoading, error } = storeToRefs(imageStore);
+const { latestSeenImageId } = storeToRefs(userHistoryStore);
+const { 
+  currentImages, currentPage, isLastPage, totalPages, isFetchingMore,
+  shouldScrollToLatest, isAutoScrolling
+} = storeToRefs(galleryViewStore);
 
 const galleryGridEl = ref<HTMLElement | null>(null);
 let cardObserver: IntersectionObserver | null = null;
@@ -24,7 +31,6 @@ const triggeredIndices = ref(new Set<number>());
 
 const setupObserver = () => {
   if (cardObserver) cardObserver.disconnect();
-
   cardObserver = new IntersectionObserver((entries) => {
     for (const entry of entries) {
       const target = entry.target as HTMLElement;
@@ -32,16 +38,19 @@ const setupObserver = () => {
       const index = parseInt(target.dataset.imageIndex || '-1', 10);
       if (!id || index === -1) continue;
 
-      if (entry.intersectionRatio > VISIBILITY_THRESHOLD) {
-        galleryStore.setCardVisibility(id, true);
-      } else {
-        galleryStore.setCardVisibility(id, false);
-      }
-      if (isTouchDevice.value && entry.isIntersecting) {
-        const isTriggerCard = (index + 1) % ITEMS_PER_PAGE === TRIGGER_CARD_INDEX;
-        if (isTriggerCard && !triggeredIndices.value.has(index)) {
-          triggeredIndices.value.add(index);
-          galleryStore.fetchMoreEndlessImages();
+      galleryViewStore.setCardVisibility(id, entry.intersectionRatio > VISIBILITY_THRESHOLD);
+      
+      if (isTouchDevice.value && entry.isIntersecting && !isAutoScrolling.value) {
+        const isPrimaryTrigger = (index + 1) % ITEMS_PER_PAGE === TRIGGER_CARD_INDEX;
+        const isFallbackTrigger = (index === currentImages.value.length - 1);
+
+        if (isPrimaryTrigger || isFallbackTrigger) {
+          const batchNumber = Math.floor(index / ITEMS_PER_PAGE);
+          const canonicalTriggerIndex = batchNumber * ITEMS_PER_PAGE + TRIGGER_CARD_INDEX;
+          if (!triggeredIndices.value.has(canonicalTriggerIndex)) {
+            triggeredIndices.value.add(canonicalTriggerIndex);
+            galleryViewStore.fetchMoreEndlessImages();
+          }
         }
       }
     }
@@ -58,9 +67,43 @@ const setupObserver = () => {
   });
 };
 
+async function scrollToLatestSeenImage() {
+  if (!latestSeenImageId.value) {
+    galleryViewStore.setAutoScrolling(false);
+    return;
+  }
+  
+  await nextTick();
+  
+  const cardToScrollTo = galleryGridEl.value?.querySelector(
+    `[data-image-id="${latestSeenImageId.value}"]`
+  );
+
+  if (cardToScrollTo) {
+    const scrollEndObserver = new IntersectionObserver((entries, observer) => {
+      const [entry] = entries;
+      if (entry.isIntersecting) {
+        galleryViewStore.setAutoScrolling(false);
+        observer.disconnect();
+      }
+    }, { threshold: VISIBILITY_THRESHOLD });
+
+    scrollEndObserver.observe(cardToScrollTo);
+
+    cardToScrollTo.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } else {
+    galleryViewStore.setAutoScrolling(false);
+  }
+}
+
 onMounted(() => {
-  galleryStore.initialize();
+  galleryViewStore.initialize();
   setupObserver();
+
+  if (shouldScrollToLatest.value) {
+    scrollToLatestSeenImage();
+    galleryViewStore.clearScrollToLatest();
+  }
 });
 
 onUnmounted(() => {
@@ -78,8 +121,8 @@ watch(currentImages, () => {
       :current-page="currentPage"
       :is-last-page="isLastPage"
       :total-pages="totalPages"
-      @change-page="galleryStore.changePage"
-      @preload-page="galleryStore.preloadPage"
+      @change-page="galleryViewStore.changePage"
+      @preload-page="galleryViewStore.preloadPage"
     />
 
     <div v-if="error" class="state-indicator error">
@@ -95,8 +138,8 @@ watch(currentImages, () => {
         <template v-else>
           <ImageCard
             v-for="(image, index) in currentImages"
-            :key="image.id"
-            :image="image"
+            :key="image?.id || `skeleton-${index}`"
+            :image="image || null"
             :index="index"
           />
         </template>
@@ -115,28 +158,24 @@ watch(currentImages, () => {
   display: flex;
   flex-direction: column;
 }
-
 .gallery-grid-holder {
   flex-grow: 1;
   overflow-y: auto;
   padding: 2rem;
   -ms-overflow-style: none;
   scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  &::-webkit-scrollbar { display: none; }
 }
-
 .gallery-grid {
   display: grid;
   gap: 1.5rem;
   grid-template-columns: 1fr;
+  //različna porazdelitev grida glede na napravo
   @media (min-width: 576px) { grid-template-columns: repeat(2, 1fr); }
   @media (min-width: 992px) { grid-template-columns: repeat(4, 1fr); }
   @media (min-width: 1400px) { grid-template-columns: repeat(5, 1fr); }
 }
-.state-indicator,
-.loading-indicator {
+.state-indicator, .loading-indicator {
   text-align: center;
   padding: 1rem;
   flex-shrink: 0;

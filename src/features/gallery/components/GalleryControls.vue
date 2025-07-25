@@ -2,7 +2,7 @@
 import { ref, watch, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useUiStore } from '@/stores/uiStore';
-import { useGalleryStore } from '@/stores/galleryStore';
+import { useGalleryViewStore } from '@/stores/galleryViewStore';
 
 import ArrowLeftIcon from '@/components/ui/ArrowLeftIcon.vue';
 import ArrowRightIcon from '@/components/ui/ArrowRightIcon.vue';
@@ -16,10 +16,10 @@ const props = defineProps<{
 const emit = defineEmits(['change-page', 'preload-page']);
 
 const uiStore = useUiStore();
-const { isTouchDevice } = storeToRefs(uiStore);
+const galleryViewStore = useGalleryViewStore();
 
-const galleryStore = useGalleryStore();
-const { visibilityStatusText } = storeToRefs(galleryStore);
+const { isTouchDevice } = storeToRefs(uiStore);
+const { visibilityStatusText } = storeToRefs(galleryViewStore);
 
 const isHoveringPrev = ref(false);
 const isHoveringNext = ref(false);

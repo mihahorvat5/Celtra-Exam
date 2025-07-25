@@ -17,7 +17,7 @@ const router = createRouter({
         {
           path: 'card-info/:id',
           name: 'card-info',
-          component: () => import('@/views/HomeView.vue')
+          component: () => import('@/features/image-detail/ImageDetailView.vue')
         }
       ]
     },

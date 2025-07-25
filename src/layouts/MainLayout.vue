@@ -1,20 +1,13 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router';
-import { storeToRefs } from 'pinia';
-import { useUiStore } from '@/stores/uiStore';
 import MainHeader from './components/MainHeader.vue';
 
-const uiStore = useUiStore();
-const { viewMode } = storeToRefs(uiStore);
 </script>
 
 <template>
   <div class="main-layout">
     <MainHeader />
-    <main
-      class="content"
-      :class="{ 'content--diff-mode': viewMode === 'DIFF' }"
-    >
+    <main class="content">
       <RouterView />
     </main>
   </div>
