@@ -1,14 +1,29 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, toRef } from 'vue';
 import { RouterLink } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import { useUserHistoryStore } from '@/stores/userHistoryStore';
+import { useImageDownloader } from '@/composables/useImageDownloader';
 import type { PicsumImage } from '@/types/Image';
+import DownloadButton from '@/components/ui/DownloadButton.vue';
 
 const props = defineProps<{
   image: PicsumImage | null;
   index: number;
 }>();
 
-const isDownloading = ref(false);
+const imageRef = toRef(props, 'image');
+const { isDownloading, handleDownload } = useImageDownloader(imageRef);
+
+const userHistoryStore = useUserHistoryStore();
+const { seenImages, latestSeenImageId } = storeToRefs(userHistoryStore);
+
+const isLatestSeen = computed(() => props.image?.id === latestSeenImageId.value);
+const isSeen = computed(() => 
+  !isLatestSeen.value && 
+  props.image?.id && 
+  seenImages.value.has(props.image.id)
+);
 
 const thumbnailUrl = computed(() => {
   if (!props.image) return '';
@@ -18,33 +33,6 @@ const thumbnailUrl = computed(() => {
   return urlParts.join('/');
 });
 
-const downloadFilename = computed(() => {
-  if (!props.image) return '';
-  const author = props.image.author.replace(/\s+/g, '-');
-  return `photo-by-${author}-${props.image.id}.jpg`;
-});
-
-async function handleDownload() {
-  if (isDownloading.value || !props.image) return;
-  isDownloading.value = true;
-  try {
-    const response = await fetch(props.image.download_url);
-    const imageBlob = await response.blob();
-    const blobUrl = URL.createObjectURL(imageBlob);
-    const tempLink = document.createElement('a');
-    tempLink.href = blobUrl;
-    tempLink.download = downloadFilename.value;
-    document.body.appendChild(tempLink);
-    tempLink.click();
-    document.body.removeChild(tempLink);
-    URL.revokeObjectURL(blobUrl);
-  } catch (error) {
-    console.error("Download failed:", error);
-  } finally {
-    isDownloading.value = false;
-  }
-}
-
 const isSkeleton = computed(() => !props.image);
 </script>
 
@@ -52,39 +40,40 @@ const isSkeleton = computed(() => !props.image);
   <div class="card-shell" :data-image-id="image?.id" :data-image-index="index">
     <RouterLink
       v-if="!isSkeleton"
-      :to="`/card-info/${image.id}`"
+      :to="`/card-info/${image?.id}`"
       class="card-link-overlay"
       aria-label="View details"
-    ></RouterLink>
+    >
+      <!-- seen / last mark -->
+      <div class="status-indicator-wrapper">
+        <span v-if="isLatestSeen" class="status-indicator latest">LATEST SEEN</span>
+        <span v-else-if="isSeen" class="status-indicator seen">SEEN</span>
+      </div>
+    </RouterLink>
 
     <figure class="card-figure">
-      <img v-if="!isSkeleton" :src="thumbnailUrl" :alt="`Photograph by ${image.author}`" class="card-img" loading="lazy" />
+      <img v-if="!isSkeleton" :src="thumbnailUrl" :alt="`Photograph by ${image?.author}`" class="card-img" loading="lazy" />
       <div v-else class="skeleton-animated skeleton-image-bg"></div>
     </figure>
 
     <div class="card-info">
       <div class="card-author">
         <span class="author-name" :class="{ 'is-skeleton': isSkeleton }">
-          {{ isSkeleton ? 'Generic Author' : image.author }}
+          {{ isSkeleton ? 'Generic Author' : image?.author }}
         </span>
       </div>
       <div class="card-download">
-        <button
-          class="download-button"
-          :class="{ 'is-skeleton': isSkeleton }"
-          :disabled="isSkeleton || isDownloading"
-          @click.prevent.stop="handleDownload"
-          aria-label="Download full resolution image"
-        >
-          {{ isSkeleton ? 'Download' : (isDownloading ? 'Downloading...' : 'Download') }}
-        </button>
+        <DownloadButton 
+          :is-loading="isSkeleton"
+          :is-downloading="isDownloading"
+          @download="handleDownload"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
-
 .card-shell {
   position: relative;
   display: flex;
@@ -138,29 +127,11 @@ const isSkeleton = computed(() => !props.image);
   text-overflow: ellipsis;
   padding-right: 0.5rem;
 }
-.download-button {
-  position: relative;
-  z-index: 2;
-  display: inline-block;
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--color-text-primary);
-  background-color: var(--color-button-bg);
-  border: 1px solid var(--color-border);
-  padding: 0.4rem 0.8rem;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  &:hover:not(.is-skeleton) {
-    border-color: var(--color-accent);
-    color: var(--color-accent);
-  }
-}
 
 @keyframes pulse {
   0% { background-color: var(--color-skeleton-start); }
-  50% { background-color: var(--color-skeleton-end); }
-  100% { background-color: var(--color-skeleton-start); }
+  50% { background-color: var(--color-skeleton-mid); }
+  100% { background-color: var(--color-skeleton-end); }
 }
 
 .skeleton-animated {
@@ -177,9 +148,28 @@ const isSkeleton = computed(() => !props.image);
   color: transparent !important;
   user-select: none;
   border-radius: 4px;
+}
 
-  &.download-button {
-    border-color: transparent !important;
+.status-indicator-wrapper {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  pointer-events: none;
+}
+.status-indicator {
+  display: block;
+  padding: 4px 8px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  border-radius: 4px;
+  color: #fff;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  &.seen {
+    background-color: rgba(97, 97, 97, 1.0);
+  }
+  &.latest {
+    background-color: rgba(0, 123, 255, 1.0);
   }
 }
 </style>
