@@ -150,6 +150,7 @@ export const useGalleryViewStore = defineStore('gallery-view', () => {
   }
 
   return {
+    isDetailViewActive,
     isAutoScrolling,
     shouldScrollToLatest,
     visibleCardIds,
