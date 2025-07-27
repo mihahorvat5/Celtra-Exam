@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ArrowBack from '@/assets/icons/arrow-back.svg?component';
+import ArrowBack from '@/assets/icons/arrow-back.svg?component'
 </script>
 
 <template>

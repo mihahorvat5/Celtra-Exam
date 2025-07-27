@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed } from 'vue'
 
 const props = defineProps<{
-  isLoading: boolean;
-  isDownloading: boolean;
-}>();
+  isLoading: boolean
+  isDownloading: boolean
+}>()
 
-defineEmits(['download']);
+defineEmits(['download'])
 
 const buttonText = computed(() => {
-  if (props.isLoading) return 'Download';
-  if (props.isDownloading) return 'Downloading...';
-  return 'Download';
-});
+  if (props.isLoading) return 'Download'
+  if (props.isDownloading) return 'Downloading...'
+  return 'Download'
+})
 </script>
 
 <template>
@@ -29,9 +29,15 @@ const buttonText = computed(() => {
 
 <style scoped lang="scss">
 @keyframes pulse {
-  0% { background-color: var(--color-skeleton-start); }
-  50% { background-color: var(--color-skeleton-mid); }
-  100% { background-color: var(--color-skeleton-end); }
+  0% {
+    background-color: var(--color-skeleton-start);
+  }
+  50% {
+    background-color: var(--color-skeleton-mid);
+  }
+  100% {
+    background-color: var(--color-skeleton-end);
+  }
 }
 
 .download-button {

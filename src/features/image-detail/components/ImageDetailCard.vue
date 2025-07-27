@@ -1,18 +1,16 @@
 <script setup lang="ts">
-import type { PicsumImage } from '@/types/Image';
+import type { PicsumImage } from '@/types/Image'
 
 defineProps<{
-  image: PicsumImage | null;
-  isLoading: boolean;
-}>();
+  image: PicsumImage | null
+  isLoading: boolean
+}>()
 </script>
 
 <template>
   <div class="card-content-area-holder">
     <div class="card-content-area">
-      <div v-if="image" class="image-dimensions">
-        {{ image.width }} x {{ image.height }}
-      </div>
+      <div v-if="image" class="image-dimensions">{{ image.width }} x {{ image.height }}</div>
       <div v-else class="image-dimensions skeleton-text">1 x 1</div>
 
       <div v-if="isLoading" class="skeleton-image"></div>
@@ -25,9 +23,15 @@ defineProps<{
 
 <style scoped lang="scss">
 @keyframes pulse {
-  0% { background-color: var(--color-skeleton-start); }
-  50% { background-color: var(--color-skeleton-mid); }
-  100% { background-color: var(--color-skeleton-end); }
+  0% {
+    background-color: var(--color-skeleton-start);
+  }
+  50% {
+    background-color: var(--color-skeleton-mid);
+  }
+  100% {
+    background-color: var(--color-skeleton-end);
+  }
 }
 
 .card-content-area-holder {
@@ -75,16 +79,16 @@ defineProps<{
   position: absolute;
   top: 1rem;
   left: 1rem;
-  z-index: 10; 
+  z-index: 10;
   color: var(--color-text-secondary);
   pointer-events: none;
 }
-.skeleton-text { 
-  color: transparent;  
+.skeleton-text {
+  color: transparent;
   background-color: var(--color-skeleton-start);
-  border-radius: 4px; 
-  user-select: none; 
-  animation: pulse 1.5s infinite ease-in-out; 
-  padding: 0rem 3rem; 
+  border-radius: 4px;
+  user-select: none;
+  animation: pulse 1.5s infinite ease-in-out;
+  padding: 0rem 3rem;
 }
 </style>

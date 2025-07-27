@@ -1,4 +1,4 @@
-import 'pinia-plugin-persistedstate'; 
+import 'pinia-plugin-persistedstate'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'

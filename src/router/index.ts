@@ -1,5 +1,5 @@
-import { createRouter, createWebHistory } from 'vue-router';
-import MainLayout from '@/layouts/MainLayout.vue';
+import { createRouter, createWebHistory } from 'vue-router'
+import MainLayout from '@/layouts/MainLayout.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -11,16 +11,16 @@ const router = createRouter({
         {
           path: '',
           name: 'gallery',
-          component: () => import('@/features/gallery/GalleryView.vue')
+          component: () => import('@/features/gallery/GalleryView.vue'),
         },
         {
           path: 'card-info/:id',
           name: 'card-info',
-          component: () => import('@/features/image-detail/ImageDetailView.vue')
-        }
-      ]
+          component: () => import('@/features/image-detail/ImageDetailView.vue'),
+        },
+      ],
     },
-  ]
-});
+  ],
+})
 
-export default router;
+export default router
