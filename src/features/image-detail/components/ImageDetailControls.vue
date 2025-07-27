@@ -85,15 +85,12 @@ defineEmits(['navigate-back', 'download']);
   display: flex; 
   align-items: center; 
   gap: 1rem; 
-  width: 1px; //ne odstrani, tu je zato ker flex extenda div
 }
-.controls-left { flex: 1; justify-content: flex-start; }
-.controls-center { flex: 1; justify-content: center; }
-.controls-right { flex: 1; justify-content: flex-end; }
+.controls-left { flex: 1 1 0; justify-content: flex-start; }
+.controls-center { flex: 1 1 0; justify-content: center; }
+.controls-right { flex: 1 1 0; justify-content: flex-end; }
 
 @media (max-width: 768px) {
-  .detail-controls {
-  }
   .controls-left-holder {
     flex: 2;
   }
@@ -105,7 +102,6 @@ defineEmits(['navigate-back', 'download']);
     gap: 0.3rem;
   }
   .controls-center, .controls-right { 
-  width: auto; //ne odstrani, tu je zato da resetta tisti 1px iz desktop viewa
   justify-content: flex-end;
 }
 }

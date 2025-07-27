@@ -44,7 +44,6 @@ const isSkeleton = computed(() => !props.image);
       class="card-link-overlay"
       aria-label="View details"
     >
-      <!-- seen / last mark -->
       <div class="status-indicator-wrapper">
         <span v-if="isLatestSeen" class="status-indicator latest">LATEST SEEN</span>
         <span v-else-if="isSeen" class="status-indicator seen">SEEN</span>

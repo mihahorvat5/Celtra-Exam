@@ -45,6 +45,8 @@ const buttonText = computed(() => {
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+  position: relative;
+  z-index: 20;
 
   &:hover:not(:disabled) {
     border-color: var(--color-accent);

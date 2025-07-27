@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useUiStore } from '@/stores/uiStore';
 import { useGalleryViewStore } from '@/stores/galleryViewStore';
-
 import ArrowLeftIcon from '@/components/ui/ArrowLeftIcon.vue';
 import ArrowRightIcon from '@/components/ui/ArrowRightIcon.vue';
 
 const props = defineProps<{
+  isTouchDevice: boolean;
   currentPage: number;
   totalPages: number | null;
   isLastPage: boolean;
@@ -15,10 +14,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['change-page', 'preload-page']);
 
-const uiStore = useUiStore();
 const galleryViewStore = useGalleryViewStore();
-
-const { isTouchDevice } = storeToRefs(uiStore);
 const { visibilityStatusText } = storeToRefs(galleryViewStore);
 
 const isHoveringPrev = ref(false);
@@ -34,17 +30,24 @@ const pagesToDisplay = computed(() => {
   const pages = [];
   const currentPage = props.currentPage;
   const total = props.totalPages;
+  
+  if (total === null && currentPage < 5) {
+      return [1, 2, 3, 4, 5];
+  }
+
   let startPage = Math.max(1, currentPage - 2);
   let endPage = startPage + 4;
-  if (total !== null) endPage = Math.min(endPage, total);
-  if (currentPage <= 3) {
-    startPage = 1;
-    endPage = total === null ? 5 : Math.min(5, total);
+  
+  if (total !== null) {
+      endPage = Math.min(endPage, total);
+      if (endPage - startPage < 4) {
+          startPage = Math.max(1, endPage - 4);
+      }
   }
-  if (total !== null && currentPage > total - 2) {
-    startPage = Math.max(1, total - 4);
+
+  for (let i = startPage; i <= endPage; i++) {
+    pages.push(i);
   }
-  for (let i = startPage; i <= endPage; i++) pages.push(i);
   return pages;
 });
 </script>
@@ -55,44 +58,42 @@ const pagesToDisplay = computed(() => {
       {{ visibilityStatusText }}
     </div>
 
-    <template v-if="!isTouchDevice">
-      <div class="pagination-controls">
-        <button
-          @click="emit('change-page', props.currentPage - 1)"
-          @mouseenter="isHoveringPrev = true; emit('preload-page', props.currentPage - 1)"
-          @mouseleave="isHoveringPrev = false"
-          :disabled="props.currentPage === 1"
-          class="pagination-button"
-          aria-label="Previous Page"
-        >
-          <ArrowLeftIcon />
-        </button>
+    <div v-if="!isTouchDevice" class="pagination-controls">
+      <button
+        @click="emit('change-page', props.currentPage - 1)"
+        @mouseenter="isHoveringPrev = true; emit('preload-page', props.currentPage - 1)"
+        @mouseleave="isHoveringPrev = false"
+        :disabled="props.currentPage === 1"
+        class="pagination-button"
+        aria-label="Previous Page"
+      >
+        <ArrowLeftIcon />
+      </button>
 
-        <button
-          v-for="page in pagesToDisplay"
-          :key="page"
-          @click="emit('change-page', page)"
-          @mouseenter="emit('preload-page', page)"
-          :class="{ 'is-active': page === props.currentPage }"
-          class="pagination-button page-number"
-          :aria-label="`Go to page ${page}`"
-          :aria-current="page === props.currentPage ? 'page' : undefined"
-        >
-          {{ page }}
-        </button>
+      <button
+        v-for="page in pagesToDisplay"
+        :key="page"
+        @click="emit('change-page', page)"
+        @mouseenter="emit('preload-page', page)"
+        :class="{ 'is-active': page === props.currentPage }"
+        class="pagination-button page-number"
+        :aria-label="`Go to page ${page}`"
+        :aria-current="page === props.currentPage ? 'page' : undefined"
+      >
+        {{ page }}
+      </button>
 
-        <button
-          @click="emit('change-page', props.currentPage + 1)"
-          @mouseenter="isHoveringNext = true; emit('preload-page', props.currentPage + 1)"
-          @mouseleave="isHoveringNext = false"
-          :disabled="props.isLastPage"
-          class="pagination-button"
-          aria-label="Next Page"
-        >
-          <ArrowRightIcon />
-        </button>
-      </div>
-    </template>
+      <button
+        @click="emit('change-page', props.currentPage + 1)"
+        @mouseenter="isHoveringNext = true; emit('preload-page', props.currentPage + 1)"
+        @mouseleave="isHoveringNext = false"
+        :disabled="props.isLastPage"
+        class="pagination-button"
+        aria-label="Next Page"
+      >
+        <ArrowRightIcon />
+      </button>
+    </div>
   </div>
 </template>
 
@@ -121,7 +122,6 @@ const pagesToDisplay = computed(() => {
   height: 2rem;
   background-color: transparent;
   border: 1px solid var(--color-border);
-  /*background-color: var(--color-surface);*/
   color: var(--color-text-primary);
   cursor: pointer;
   font-weight: 500;
@@ -141,13 +141,11 @@ const pagesToDisplay = computed(() => {
     cursor: not-allowed;
   }
   &.is-active {
-    /*background-color: var(--color-accent);*/
     color: var(--color-accent);
     border-color: var(--color-accent);
     font-weight: 700;
   }
   &:not(.is-active) {
-    /*background-color: var(--color-accent);*/
     border: none;
   }
 }
