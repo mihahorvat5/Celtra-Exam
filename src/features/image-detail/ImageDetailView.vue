@@ -36,6 +36,7 @@ function handleNavigateBack() {
 watch(imageId, (newId, oldId) => {
   if (newId && newId !== oldId) {
     loadImageData(newId);
+    galleryViewStore.preloadNeighboringImages(newId);
   }
 }, { immediate: true });
 
@@ -44,10 +45,9 @@ onMounted(() => {
   galleryViewStore.clearDetailViewPreloadCache();
 
   if (!image.value) {
-    loadImageData(imageId.value);
   } else {
-    //seen mark
     userHistoryStore.markAsSeen(imageId.value);
+    galleryViewStore.preloadNeighboringImages(imageId.value);
   }
 });
 

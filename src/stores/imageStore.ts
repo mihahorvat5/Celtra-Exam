@@ -9,16 +9,21 @@ export const useImageStore = defineStore('image', () => {
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
-  const findImageById = computed(() => {
-    return (id: string): PicsumImage | undefined => imagesById.value[id];
-  });
+  function findImageById(id: string): PicsumImage | undefined {
+    return imagesById.value[id];
+  }
 
   function upsertImages(incomingImages: PicsumImage[]) {
-    for (const newImage of incomingImages) {
-      if (!newImage || !newImage.id) continue;
-      const existingImage = imagesById.value[newImage.id] || {};
-      imagesById.value[newImage.id] = { ...existingImage, ...newImage };
-    }
+    if (!incomingImages || incomingImages.length === 0) return;
+
+    const newImageMap = incomingImages.reduce((acc, image) => {
+      if (image && image.id) {
+        acc[image.id] = { ...(imagesById.value[image.id] || {}), ...image };
+      }
+      return acc;
+    }, {} as Record<string, PicsumImage>);
+
+    Object.assign(imagesById.value, newImageMap);
   }
 
   async function fetchImageList(page: number, limit: number): Promise<PicsumImage[]> {

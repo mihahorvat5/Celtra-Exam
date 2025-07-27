@@ -1,137 +1,91 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, watch, nextTick } from 'vue';
+import { onMounted, onUnmounted, ref, watch, nextTick, computed } from 'vue';
 import { storeToRefs } from 'pinia';
+
 import { useUiStore } from '@/stores/uiStore';
 import { useImageStore } from '@/stores/imageStore';
 import { useGalleryViewStore } from '@/stores/galleryViewStore';
 import { useUserHistoryStore } from '@/stores/userHistoryStore';
+
+import { usePaginationStore } from '@/stores/paginationStore';
+import { useInfiniteScrollStore } from '@/stores/infiniteScrollStore';
+
+import { useImageObserver } from './composables/useImageObserver';
+
 import ImageCard from './components/ImageCard.vue';
 import GalleryControls from './components/GalleryControls.vue';
-
-const ITEMS_PER_PAGE = 20;
-const TRIGGER_CARD_INDEX = 13;
-const VISIBILITY_THRESHOLD = 0.5;
 
 const uiStore = useUiStore();
 const imageStore = useImageStore();
 const galleryViewStore = useGalleryViewStore();
 const userHistoryStore = useUserHistoryStore();
+const paginationStore = usePaginationStore();
+const infiniteScrollStore = useInfiniteScrollStore();
 
 const { isTouchDevice } = storeToRefs(uiStore);
 const { isLoading, error } = storeToRefs(imageStore);
 const { latestSeenImageId } = storeToRefs(userHistoryStore);
-const { 
-  currentImages, currentPage, isLastPage, totalPages, isFetchingMore,
-  shouldScrollToLatest, isAutoScrolling
-} = storeToRefs(galleryViewStore);
+const { shouldScrollToLatest, isAutoScrolling } = storeToRefs(galleryViewStore);
+const { currentPage, isLastPage, totalPages } = storeToRefs(paginationStore);
+const { isFetching: isFetchingMore, imageIds: mobileImageIds } = storeToRefs(infiniteScrollStore);
 
-const galleryGridEl = ref<HTMLElement | null>(null);
-let cardObserver: IntersectionObserver | null = null;
-const triggeredIndices = ref(new Set<number>());
+const currentImages = computed(() => {
+  const imageIds = isTouchDevice.value ? mobileImageIds.value : paginationStore.currentImageIds;
+  return imageIds.map(id => imageStore.findImageById(id));
+});
 
-const setupObserver = () => {
-  if (cardObserver) cardObserver.disconnect();
-  cardObserver = new IntersectionObserver((entries) => {
-    for (const entry of entries) {
-      const target = entry.target as HTMLElement;
-      const id = target.dataset.imageId;
-      const index = parseInt(target.dataset.imageIndex || '-1', 10);
-      if (!id || index === -1) continue;
+const scrollContainerRef = ref<HTMLElement | null>(null);
 
-      galleryViewStore.setCardVisibility(id, entry.intersectionRatio > VISIBILITY_THRESHOLD);
-      
-      if (isTouchDevice.value && entry.isIntersecting && !isAutoScrolling.value) {
-        const isPrimaryTrigger = (index + 1) % ITEMS_PER_PAGE === TRIGGER_CARD_INDEX;
-        const isFallbackTrigger = (index === currentImages.value.length - 1);
-
-        if (isPrimaryTrigger || isFallbackTrigger) {
-          const batchNumber = Math.floor(index / ITEMS_PER_PAGE);
-          const canonicalTriggerIndex = batchNumber * ITEMS_PER_PAGE + TRIGGER_CARD_INDEX;
-          if (!triggeredIndices.value.has(canonicalTriggerIndex)) {
-            triggeredIndices.value.add(canonicalTriggerIndex);
-            galleryViewStore.fetchMoreEndlessImages();
-          }
-        }
-      }
-    }
-  }, {
-    root: null,
-    threshold: [0, 0.25, 0.5, VISIBILITY_THRESHOLD, 0.75, 1.0],
-  });
-
-  nextTick(() => {
-    if (galleryGridEl.value) {
-      const cards = galleryGridEl.value.querySelectorAll('.card-shell');
-      cards.forEach(card => cardObserver?.observe(card));
-    }
-  });
-};
+useImageObserver(scrollContainerRef, currentImages);
 
 async function scrollToLatestSeenImage() {
   if (!latestSeenImageId.value) {
-    galleryViewStore.setAutoScrolling(false);
+    galleryViewStore.isAutoScrolling = false;
     return;
   }
-  
   await nextTick();
-  
-  const cardToScrollTo = galleryGridEl.value?.querySelector(
-    `[data-image-id="${latestSeenImageId.value}"]`
-  );
-
+  const cardToScrollTo = scrollContainerRef.value?.querySelector(`[data-image-id="${latestSeenImageId.value}"]`);
   if (cardToScrollTo) {
-    const scrollEndObserver = new IntersectionObserver((entries, observer) => {
-      const [entry] = entries;
-      if (entry.isIntersecting) {
-        galleryViewStore.setAutoScrolling(false);
-        observer.disconnect();
-      }
-    }, { threshold: VISIBILITY_THRESHOLD });
-
-    scrollEndObserver.observe(cardToScrollTo);
-
+    galleryViewStore.isAutoScrolling = true;
     cardToScrollTo.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => { galleryViewStore.isAutoScrolling = false; }, 1000);
   } else {
-    galleryViewStore.setAutoScrolling(false);
+    galleryViewStore.isAutoScrolling = false;
   }
 }
 
-onMounted(() => {
-  galleryViewStore.initialize();
-  setupObserver();
-
-  if (shouldScrollToLatest.value) {
-    scrollToLatestSeenImage();
-    galleryViewStore.clearScrollToLatest();
+watch(currentPage, () => {
+  if (!isTouchDevice.value && scrollContainerRef.value) {
+    scrollContainerRef.value.scrollTo({ top: 0, behavior: 'smooth' });
+    galleryViewStore.visibleCardIds.clear();
   }
 });
 
-onUnmounted(() => {
-  if (cardObserver) cardObserver.disconnect();
+onMounted(() => {
+  galleryViewStore.initialize();
+  if (shouldScrollToLatest.value) {
+    scrollToLatestSeenImage();
+    galleryViewStore.shouldScrollToLatest = false;
+  }
 });
-
-watch(currentImages, () => {
-  setupObserver();
-}, { deep: true });
 </script>
 
 <template>
   <div class="gallery-view">
     <GalleryControls
+      :is-touch-device="isTouchDevice"
       :current-page="currentPage"
       :is-last-page="isLastPage"
       :total-pages="totalPages"
-      @change-page="galleryViewStore.changePage"
-      @preload-page="galleryViewStore.preloadPage"
+      @change-page="paginationStore.changePage"
+      @preload-page="paginationStore.preloadPage"
     />
-
     <div v-if="error" class="state-indicator error">
       <h2>Something went wrong</h2>
       <p>{{ error }}</p>
     </div>
-
-    <div class="gallery-grid-holder">
-      <div ref="galleryGridEl" class="gallery-grid">
+    <div ref="scrollContainerRef" class="gallery-grid-holder">
+      <div class="gallery-grid">
         <template v-if="isLoading && currentImages.length === 0">
           <ImageCard v-for="n in 20" :key="`skeleton-${n}`" :image="null" :index="n-1" />
         </template>
@@ -170,7 +124,6 @@ watch(currentImages, () => {
   display: grid;
   gap: 1.5rem;
   grid-template-columns: 1fr;
-  //različna porazdelitev grida glede na napravo
   @media (min-width: 576px) { grid-template-columns: repeat(2, 1fr); }
   @media (min-width: 992px) { grid-template-columns: repeat(4, 1fr); }
   @media (min-width: 1400px) { grid-template-columns: repeat(5, 1fr); }

@@ -1,6 +1,6 @@
 import type { PicsumImage } from '@/types/Image';
 
-//zadeva potrebuje .env da deluje
+//this needs .env to operate!
 const API_BASE_URL = import.meta.env.VITE_PICSUM_API_BASE_URL;
 
 const ENDPOINTS = {

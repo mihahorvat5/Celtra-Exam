@@ -1,28 +1,16 @@
-import { ref, watch } from 'vue';
 import { defineStore } from 'pinia';
+import type { PersistenceOptions } from 'pinia-plugin-persistedstate';
 
-const DARK_MODE_STORAGE_KEY = 'celtraExam-dark-mode';
+export const useUiStore = defineStore('ui', {
+  state: () => ({
+    isDarkMode: false,
+  }),
 
-export const useUiStore = defineStore('ui', () => {
-  const isDarkMode = ref<boolean>(
-    localStorage.getItem(DARK_MODE_STORAGE_KEY) === 'true'
-  );
+  getters: {
+    isTouchDevice: () => window.matchMedia('(pointer: coarse)').matches,
+  },
 
-  const isTouchDevice = ref(window.matchMedia('(pointer: coarse)').matches);
-
-  watch(isDarkMode, (newVal) => {
-    const rootEl = document.documentElement;
-    if (newVal) {
-      rootEl.setAttribute('data-theme', 'dark');
-      localStorage.setItem(DARK_MODE_STORAGE_KEY, 'true');
-    } else {
-      rootEl.removeAttribute('data-theme');
-      localStorage.setItem(DARK_MODE_STORAGE_KEY, 'false');
-    }
-  }, { immediate: true });
-
-  return {
-    isDarkMode,
-    isTouchDevice,
-  };
+  persist: {
+    paths: ['isDarkMode'],
+  } as PersistenceOptions,
 });

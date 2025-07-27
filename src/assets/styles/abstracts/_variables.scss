@@ -24,8 +24,8 @@ $skeleton-end: #e9ecef;
   --color-logo: #000000;
 
   --color-skeleton-start:     #{$skeleton-start};
-  --color-skeleton-end:       #{$skeleton-mid};
-  --color-skeleton-start:     #{$skeleton-end};
+  --color-skeleton-mid:       #{$skeleton-mid};
+  --color-skeleton-end:     #{$skeleton-end};
 
   --color-background:         #{$light-bg};
   --color-surface:            #{$light-surface};
@@ -46,8 +46,8 @@ html[data-theme='dark'] {
   --color-logo: #FFFFFF;
 
   --color-skeleton-start:     #{$skeleton-start};
-  --color-skeleton-end:       #{$skeleton-mid};
-  --color-skeleton-start:     #{$skeleton-end};
+  --color-skeleton-mid:       #{$skeleton-mid};
+  --color-skeleton-end:     #{$skeleton-end};
 
   --color-background:         #{$dark-bg};
   --color-surface:            #{$dark-surface};
