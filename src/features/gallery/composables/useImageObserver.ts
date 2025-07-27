@@ -33,7 +33,12 @@ export function useImageObserver(
 
           galleryViewStore.setCardVisibility(id, entry.intersectionRatio > VISIBILITY_THRESHOLD)
 
-          if (isTouchDevice.value && entry.isIntersecting && !isAutoScrolling.value && !isDetailViewActive.value) {
+          if (
+            isTouchDevice.value &&
+            entry.isIntersecting &&
+            !isAutoScrolling.value &&
+            !isDetailViewActive.value
+          ) {
             const triggerIndex = imagesRef.value.length - (TRIGGER_CARD_INDEX_OFFSET_MOBILE + 1)
 
             if (index >= triggerIndex) {
