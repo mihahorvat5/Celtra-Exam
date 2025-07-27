@@ -1,39 +1,37 @@
 <script setup lang="ts">
-import { computed, toRef } from 'vue';
-import { RouterLink } from 'vue-router';
-import { storeToRefs } from 'pinia';
-import { useUserHistoryStore } from '@/stores/userHistoryStore';
-import { useImageDownloader } from '@/composables/useImageDownloader';
-import type { PicsumImage } from '@/types/Image';
-import DownloadButton from '@/components/ui/DownloadButton.vue';
+import { computed, toRef } from 'vue'
+import { RouterLink } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import { useUserHistoryStore } from '@/stores/userHistoryStore'
+import { useImageDownloader } from '@/composables/useImageDownloader'
+import type { PicsumImage } from '@/types/Image'
+import DownloadButton from '@/components/ui/DownloadButton.vue'
 
 const props = defineProps<{
-  image: PicsumImage | null;
-  index: number;
-}>();
+  image: PicsumImage | null
+  index: number
+}>()
 
-const imageRef = toRef(props, 'image');
-const { isDownloading, handleDownload } = useImageDownloader(imageRef);
+const imageRef = toRef(props, 'image')
+const { isDownloading, handleDownload } = useImageDownloader(imageRef)
 
-const userHistoryStore = useUserHistoryStore();
-const { seenImages, latestSeenImageId } = storeToRefs(userHistoryStore);
+const userHistoryStore = useUserHistoryStore()
+const { seenImages, latestSeenImageId } = storeToRefs(userHistoryStore)
 
-const isLatestSeen = computed(() => props.image?.id === latestSeenImageId.value);
-const isSeen = computed(() => 
-  !isLatestSeen.value && 
-  props.image?.id && 
-  seenImages.value.has(props.image.id)
-);
+const isLatestSeen = computed(() => props.image?.id === latestSeenImageId.value)
+const isSeen = computed(
+  () => !isLatestSeen.value && props.image?.id && seenImages.value.has(props.image.id),
+)
 
 const thumbnailUrl = computed(() => {
-  if (!props.image) return '';
-  const urlParts = props.image.download_url.split('/');
-  urlParts[urlParts.length - 2] = '600';
-  urlParts[urlParts.length - 1] = '400';
-  return urlParts.join('/');
-});
+  if (!props.image) return ''
+  const urlParts = props.image.download_url.split('/')
+  urlParts[urlParts.length - 2] = '600'
+  urlParts[urlParts.length - 1] = '400'
+  return urlParts.join('/')
+})
 
-const isSkeleton = computed(() => !props.image);
+const isSkeleton = computed(() => !props.image)
 </script>
 
 <template>
@@ -51,7 +49,13 @@ const isSkeleton = computed(() => !props.image);
     </RouterLink>
 
     <figure class="card-figure">
-      <img v-if="!isSkeleton" :src="thumbnailUrl" :alt="`Photograph by ${image?.author}`" class="card-img" loading="lazy" />
+      <img
+        v-if="!isSkeleton"
+        :src="thumbnailUrl"
+        :alt="`Photograph by ${image?.author}`"
+        class="card-img"
+        loading="lazy"
+      />
       <div v-else class="skeleton-animated skeleton-image-bg"></div>
     </figure>
 
@@ -62,7 +66,7 @@ const isSkeleton = computed(() => !props.image);
         </span>
       </div>
       <div class="card-download">
-        <DownloadButton 
+        <DownloadButton
           :is-loading="isSkeleton"
           :is-downloading="isDownloading"
           @download="handleDownload"
@@ -80,7 +84,9 @@ const isSkeleton = computed(() => !props.image);
   background-color: var(--color-surface);
   border-radius: 8px;
   overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
@@ -88,7 +94,10 @@ const isSkeleton = computed(() => !props.image);
 }
 .card-link-overlay {
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 1;
 }
 .card-figure {
@@ -114,7 +123,9 @@ const isSkeleton = computed(() => !props.image);
 }
 
 .card-img {
-  width: 100%; height: 100%; object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 .author-name {
   font-size: 0.9rem;
@@ -128,9 +139,15 @@ const isSkeleton = computed(() => !props.image);
 }
 
 @keyframes pulse {
-  0% { background-color: var(--color-skeleton-start); }
-  50% { background-color: var(--color-skeleton-mid); }
-  100% { background-color: var(--color-skeleton-end); }
+  0% {
+    background-color: var(--color-skeleton-start);
+  }
+  50% {
+    background-color: var(--color-skeleton-mid);
+  }
+  100% {
+    background-color: var(--color-skeleton-end);
+  }
 }
 
 .skeleton-animated {
@@ -165,10 +182,10 @@ const isSkeleton = computed(() => !props.image);
   color: #fff;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
   &.seen {
-    background-color: rgba(97, 97, 97, 1.0);
+    background-color: rgba(97, 97, 97, 1);
   }
   &.latest {
-    background-color: rgba(0, 123, 255, 1.0);
+    background-color: rgba(0, 123, 255, 1);
   }
 }
 </style>

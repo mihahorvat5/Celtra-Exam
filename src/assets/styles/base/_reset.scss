@@ -4,7 +4,16 @@
   box-sizing: border-box;
 }
 
-body, h1, h2, h3, h4, p, figure, blockquote, dl, dd {
+body,
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+blockquote,
+dl,
+dd {
   margin: 0;
   padding: 0;
 }
@@ -13,7 +22,8 @@ html:focus-within {
   scroll-behavior: smooth;
 }
 
-body, html {
+body,
+html {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -22,16 +32,21 @@ body, html {
   overflow: auto;
 }
 
-img, picture {
+img,
+picture {
   max-width: 100%;
   display: block;
 }
 
-input, button, textarea, select {
+input,
+button,
+textarea,
+select {
   font: inherit;
 }
 
-ul[role='list'], ol[role='list'] {
+ul[role='list'],
+ol[role='list'] {
   list-style: none;
   padding: 0;
   margin: 0;

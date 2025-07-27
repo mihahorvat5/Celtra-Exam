@@ -1,18 +1,18 @@
 // light mode definitions
-$light-bg:      #F4F5F6;
-$light-surface: #FFFFFF;
-$light-text:    #454555;
-$light-muted:   #AAACB7;
-$light-button:  #E7E8EB;
+$light-bg: #f4f5f6;
+$light-surface: #ffffff;
+$light-text: #454555;
+$light-muted: #aaacb7;
+$light-button: #e7e8eb;
 
 // dark mode definitions
-$dark-bg:       #000D4C;
-$dark-surface:  #101F5C;
-$dark-text:     #E9ECEF;
-$dark-muted:    #8A92B2;
-$dark-button:   #3e4e88;
+$dark-bg: #000d4c;
+$dark-surface: #101f5c;
+$dark-text: #e9ecef;
+$dark-muted: #8a92b2;
+$dark-button: #3e4e88;
 
-$accent-blue:   #367BFF;
+$accent-blue: #367bff;
 
 // combined
 $skeleton-start: #efe9e9;
@@ -23,44 +23,44 @@ $skeleton-end: #e9ecef;
   // default
   --color-logo: #000000;
 
-  --color-skeleton-start:     #{$skeleton-start};
-  --color-skeleton-mid:       #{$skeleton-mid};
-  --color-skeleton-end:     #{$skeleton-end};
+  --color-skeleton-start: #{$skeleton-start};
+  --color-skeleton-mid: #{$skeleton-mid};
+  --color-skeleton-end: #{$skeleton-end};
 
-  --color-background:         #{$light-bg};
-  --color-surface:            #{$light-surface};
-  --color-border:             #{$light-button};
+  --color-background: #{$light-bg};
+  --color-surface: #{$light-surface};
+  --color-border: #{$light-button};
 
-  --color-text-primary:       #{$light-text};
-  --color-text-secondary:     #{$light-muted};
+  --color-text-primary: #{$light-text};
+  --color-text-secondary: #{$light-muted};
 
-  --color-button-bg:          #{$light-button};
-  --color-button-text:        #{$light-text};
+  --color-button-bg: #{$light-button};
+  --color-button-text: #{$light-text};
 
-  --color-accent:             #{$accent-blue};
-  --color-accent-text:        #{$light-surface};
+  --color-accent: #{$accent-blue};
+  --color-accent-text: #{$light-surface};
 }
 
 html[data-theme='dark'] {
   // dark mode
-  --color-logo: #FFFFFF;
+  --color-logo: #ffffff;
 
-  --color-skeleton-start:     #{$skeleton-start};
-  --color-skeleton-mid:       #{$skeleton-mid};
-  --color-skeleton-end:     #{$skeleton-end};
+  --color-skeleton-start: #{$skeleton-start};
+  --color-skeleton-mid: #{$skeleton-mid};
+  --color-skeleton-end: #{$skeleton-end};
 
-  --color-background:         #{$dark-bg};
-  --color-surface:            #{$dark-surface};
-  --color-border:             #{$dark-button};
+  --color-background: #{$dark-bg};
+  --color-surface: #{$dark-surface};
+  --color-border: #{$dark-button};
 
-  --color-text-primary:       #{$dark-text};
-  --color-text-secondary:     #{$dark-muted};
+  --color-text-primary: #{$dark-text};
+  --color-text-secondary: #{$dark-muted};
 
-  --color-button-bg:          #{$dark-button};
-  --color-button-text:        #{$dark-text};
+  --color-button-bg: #{$dark-button};
+  --color-button-text: #{$dark-text};
 
-  --color-accent:             #{$accent-blue};
-  --color-accent-text:        #{$light-surface};
+  --color-accent: #{$accent-blue};
+  --color-accent-text: #{$light-surface};
 
   color-scheme: dark;
 }

@@ -1,14 +1,9 @@
 <script setup lang="ts">
-const model = defineModel<boolean>();
+const model = defineModel<boolean>()
 </script>
 
 <template>
-  <button
-    class="toggle-switch"
-    role="switch"
-    :aria-checked="model"
-    @click="model = !model"
-  >
+  <button class="toggle-switch" role="switch" :aria-checked="model" @click="model = !model">
     <span class="track"></span>
     <span class="thumb">
       <slot v-if="model" name="on"></slot>
@@ -76,7 +71,7 @@ $transition-speed: 0.2s;
 
   .thumb {
     transform: translateX($track-width - $thumb-size - (2 * $padding));
-    
+
     :deep(svg) {
       color: var(--color-accent);
     }

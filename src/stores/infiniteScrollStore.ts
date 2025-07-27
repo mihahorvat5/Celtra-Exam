@@ -1,6 +1,6 @@
-import { defineStore } from 'pinia';
-import { useImageStore } from './imageStore';
-import { ITEMS_PER_PAGE_MOBILE } from '@/config/constants';
+import { defineStore } from 'pinia'
+import { useImageStore } from './imageStore'
+import { ITEMS_PER_PAGE_MOBILE } from '@/config/constants'
 
 export const useInfiniteScrollStore = defineStore('infinite-scroll', {
   state: () => ({
@@ -11,26 +11,26 @@ export const useInfiniteScrollStore = defineStore('infinite-scroll', {
   }),
   getters: {
     allImageIds(state): string[] {
-      return state.imageIds;
+      return state.imageIds
     },
   },
   actions: {
     async fetchMore() {
-      if (this.isFetching || !this.hasMore) return;
-      
-      const imageStore = useImageStore();
-      this.isFetching = true;
+      if (this.isFetching || !this.hasMore) return
+
+      const imageStore = useImageStore()
+      this.isFetching = true
       try {
-        const newImages = await imageStore.fetchImageList(this.nextPage, ITEMS_PER_PAGE_MOBILE);
+        const newImages = await imageStore.fetchImageList(this.nextPage, ITEMS_PER_PAGE_MOBILE)
         if (newImages.length > 0) {
-          this.imageIds.push(...newImages.map(img => img.id));
-          this.nextPage++;
+          this.imageIds.push(...newImages.map((img) => img.id))
+          this.nextPage++
         } else {
-          this.hasMore = false;
+          this.hasMore = false
         }
       } finally {
-        this.isFetching = false;
+        this.isFetching = false
       }
     },
   },
-});
+})

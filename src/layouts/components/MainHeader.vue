@@ -1,18 +1,17 @@
 <script setup lang="ts">
-import { RouterLink } from 'vue-router';
-import { storeToRefs } from 'pinia';
+import { RouterLink } from 'vue-router'
+import { storeToRefs } from 'pinia'
 
-import { useUiStore } from '@/stores/uiStore';
-import IconToggle from '@/components/ui/IconToggle.vue';
+import { useUiStore } from '@/stores/uiStore'
+import IconToggle from '@/components/ui/IconToggle.vue'
 
-import Logo from '@/assets/logos/logo.svg?component';
+import Logo from '@/assets/logos/logo.svg?component'
 
-import MoonIcon from '@/assets/icons/moon.svg?component';
-import SunIcon from '@/assets/icons/sun.svg?component';
+import MoonIcon from '@/assets/icons/moon.svg?component'
+import SunIcon from '@/assets/icons/sun.svg?component'
 
-const uiStore = useUiStore();
-const { isDarkMode } = storeToRefs(uiStore);
-
+const uiStore = useUiStore()
+const { isDarkMode } = storeToRefs(uiStore)
 </script>
 
 <template>

@@ -1,5 +1,5 @@
-import { defineStore } from 'pinia';
-import type { PersistenceOptions } from 'pinia-plugin-persistedstate';
+import { defineStore } from 'pinia'
+import type { PersistenceOptions } from 'pinia-plugin-persistedstate'
 
 export const useUiStore = defineStore('ui', {
   state: () => ({
@@ -13,4 +13,4 @@ export const useUiStore = defineStore('ui', {
   persist: {
     paths: ['isDarkMode'],
   } as PersistenceOptions,
-});
+})
