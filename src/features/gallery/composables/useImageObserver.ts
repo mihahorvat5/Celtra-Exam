@@ -6,24 +6,19 @@ import { useGalleryViewStore } from '@/stores/galleryViewStore'
 import { useInfiniteScrollStore } from '@/stores/infiniteScrollStore'
 import { useUiStore } from '@/stores/uiStore'
 
-import {
-  ITEMS_PER_PAGE_MOBILE,
-  TRIGGER_CARD_INDEX_OFFSET_MOBILE,
-  VISIBILITY_THRESHOLD,
-} from '@/config/constants'
+import { TRIGGER_CARD_INDEX_OFFSET_MOBILE, VISIBILITY_THRESHOLD } from '@/config/constants'
 
-const TRIGGER_CARD_INDEX = ITEMS_PER_PAGE_MOBILE - TRIGGER_CARD_INDEX_OFFSET_MOBILE
 export function useImageObserver(
   scrollContainerRef: Ref<HTMLElement | null>,
   imagesRef: Ref<(PicsumImage | undefined)[]>,
 ) {
   const galleryViewStore = useGalleryViewStore()
   const infiniteScrollStore = useInfiniteScrollStore()
+
   const { isTouchDevice } = storeToRefs(useUiStore())
-  const { isAutoScrolling } = storeToRefs(galleryViewStore)
+  const { isAutoScrolling, isDetailViewActive } = storeToRefs(galleryViewStore)
 
   let observer: IntersectionObserver | null = null
-  const triggeredPages = ref(new Set<number>())
 
   const setupObserver = () => {
     if (observer) observer.disconnect()
@@ -38,17 +33,11 @@ export function useImageObserver(
 
           galleryViewStore.setCardVisibility(id, entry.intersectionRatio > VISIBILITY_THRESHOLD)
 
-          if (isTouchDevice.value && entry.isIntersecting && !isAutoScrolling.value) {
-            const pageToTrigger = Math.floor(index / ITEMS_PER_PAGE_MOBILE) + 1
+          if (isTouchDevice.value && entry.isIntersecting && !isAutoScrolling.value && !isDetailViewActive.value) {
+            const triggerIndex = imagesRef.value.length - (TRIGGER_CARD_INDEX_OFFSET_MOBILE + 1)
 
-            if (!triggeredPages.value.has(pageToTrigger)) {
-              const isTriggerCard = (index + 1) % ITEMS_PER_PAGE_MOBILE === TRIGGER_CARD_INDEX
-              const isLastCard = index === imagesRef.value.length - 1
-
-              if (isTriggerCard || isLastCard) {
-                infiniteScrollStore.fetchMore()
-                triggeredPages.value.add(pageToTrigger)
-              }
+            if (index >= triggerIndex) {
+              infiniteScrollStore.fetchMore()
             }
           }
         }
