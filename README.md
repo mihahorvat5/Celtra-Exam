@@ -64,6 +64,11 @@ Follow these instructions to get the project running on your local machine.
     ```bash
     npm install
     ```
+4.  **Create .env:**
+    ```bash
+    VITE_PICSUM_API_BASE_URL=https://picsum.photos
+    ```
+    
 
 #### Running the Development Server
 
@@ -90,6 +95,10 @@ The application is fully containerized for easy deployment.
     ```bash
     cd .\Celtra-Exam\
     ```
+2.  **Create .env:**
+    ```bash
+    VITE_PICSUM_API_BASE_URL=https://picsum.photos
+    ```
 2.  **Build the Docker image:**
     ```bash
     docker build -t celtra-exam-app .
@@ -111,7 +120,7 @@ The project includes many tests.
     ```bash
     cd .\Celtra-Exam\
     ```
-2.   **Run all tests once:**
-```bash
-npm run test:unit
-```
+2.  **Run all tests once:**
+    ```bash
+    npm run test:unit
+    ```
