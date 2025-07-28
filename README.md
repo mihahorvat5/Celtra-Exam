@@ -112,8 +112,6 @@ The project includes many tests.
     cd .\Celtra-Exam\
     ```
 2.   **Run all tests once:**
-    ```bash
-    npm run test:unit
-    ```
-
----
+```bash
+npm run test:unit
+```
